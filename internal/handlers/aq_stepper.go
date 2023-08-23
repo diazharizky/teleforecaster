@@ -36,6 +36,10 @@ func aqStepper(appCtx app.Ctx) func(ctx tb.Context) error {
 				return err
 			}
 
+			if len(cities) <= 0 {
+				return ctx.Send("Mohon maaf data untuk provinsi tersebut belum tersedia.")
+			}
+
 			for i, c := range cities {
 				pickCityQuestion += fmt.Sprintf("%d. %s\n", i+1, c)
 			}
@@ -63,15 +67,6 @@ func aqStepper(appCtx app.Ctx) func(ctx tb.Context) error {
 			return err
 		}
 
-		template := "Kota/Kabupaten: %s\nProvinsi: %s\nSuhu: %s\nKualitas Udara: %s"
-		msg := fmt.Sprintf(
-			template,
-			resp.City,
-			resp.State,
-			resp.TempLevel(),
-			resp.AQL(),
-		)
-
-		return ctx.Send(msg)
+		return ctx.Send(resp.Report())
 	}
 }

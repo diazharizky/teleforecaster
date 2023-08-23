@@ -24,6 +24,10 @@ func (m getCitiesModule) Call(country, state string) ([]string, error) {
 			return nil, err
 		}
 
+		if len(data) <= 0 {
+			return []string{}, nil
+		}
+
 		cities = make([]string, len(data))
 		for i, d := range data {
 			cities[i] = d.City

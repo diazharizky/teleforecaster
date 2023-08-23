@@ -26,6 +26,10 @@ func (c Client) GetCities(country, state string) (data []City, err error) {
 		}
 	}()
 
+	if resp.StatusCode != 200 {
+		return []City{}, nil
+	}
+
 	var baseResponse BaseResponse
 	if err = resp.Decode(&baseResponse); err != nil {
 		return nil, err

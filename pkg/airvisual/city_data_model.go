@@ -105,3 +105,16 @@ func (data CityData) AQL() (aql string) {
 
 	return airQualityLevels[0]
 }
+
+func (data CityData) Report() string {
+	template := "Kota/Kabupaten: %s\nProvinsi: %s\nSuhu: %s\nKualitas Udara: %s"
+	report := fmt.Sprintf(
+		template,
+		data.City,
+		data.State,
+		data.TempLevel(),
+		data.AQL(),
+	)
+
+	return report
+}
