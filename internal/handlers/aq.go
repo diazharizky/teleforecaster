@@ -17,18 +17,16 @@ func aq(appCtx app.Ctx) func(ctx tb.Context) error {
 
 		states, err := appCtx.GetStatesModule.Call(country)
 		if err != nil {
-			return err
+			return ctx.Send(
+				resolveErrMessage(err),
+			)
 		}
 
-		if len(states) <= 0 {
-			return ctx.Send("Gagal mengambil data provinsi.")
+		pickStateMsg := "Pilih provinsi:\n"
+		for i, state := range states {
+			pickStateMsg += fmt.Sprintf("%d. %s\n", i+1, state)
 		}
 
-		stateMsg := "Pilih provinsi:\n"
-		for i, s := range states {
-			stateMsg += fmt.Sprintf("%d. %s\n", i+1, s)
-		}
-
-		return ctx.Send(stateMsg)
+		return ctx.Send(pickStateMsg)
 	}
 }

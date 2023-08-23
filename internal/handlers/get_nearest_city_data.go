@@ -11,9 +11,13 @@ func getNearestCityData(appCtx app.Ctx) func(ctx tb.Context) error {
 
 		data, err := appCtx.GetDataByLocationModule.Call(loc.Lat, loc.Lng)
 		if err != nil {
-			return ctx.Send("Terjadi kesalahan.")
+			return ctx.Send(
+				resolveErrMessage(err),
+			)
 		}
 
-		return ctx.Send(data.Report())
+		return ctx.Send(
+			data.Report(),
+		)
 	}
 }

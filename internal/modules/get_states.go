@@ -13,11 +13,7 @@ func NewGetStatesModule(appCtx app.Ctx) getStatesModule {
 }
 
 func (m getStatesModule) Call(country string) ([]string, error) {
-	states, err := m.appCtx.StateRepository.List(country)
-	if err != nil {
-		return nil, err
-	}
-
+	states := m.appCtx.StateRepository.List(country)
 	if len(states) <= 0 {
 		data, err := m.appCtx.AirVisualClient.GetStates(country)
 		if err != nil {
@@ -29,9 +25,7 @@ func (m getStatesModule) Call(country string) ([]string, error) {
 			states[i] = d.State
 		}
 
-		if err = m.appCtx.StateRepository.Save(country, states); err != nil {
-			return nil, err
-		}
+		m.appCtx.StateRepository.Save(country, states)
 	}
 
 	return states, nil

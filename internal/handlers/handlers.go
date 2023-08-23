@@ -29,7 +29,7 @@ func Init(appCtx app.Ctx) (h []models.Handler) {
 		},
 		{
 			Endpoint:    telebot.OnText,
-			Description: "A handler that is still part of `/aq`",
+			Description: "Part part of `/aq` handler",
 			Fn:          aqStepper(appCtx),
 		},
 	}

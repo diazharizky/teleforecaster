@@ -8,6 +8,8 @@ import (
 	tb "gopkg.in/telebot.v3"
 )
 
+const invalidInputMsg = "Input tidak sesuai."
+
 func aqStepper(appCtx app.Ctx) func(ctx tb.Context) error {
 	return func(ctx tb.Context) error {
 		senderID := ctx.Sender().ID
@@ -21,52 +23,73 @@ func aqStepper(appCtx app.Ctx) func(ctx tb.Context) error {
 		if session.state == "" {
 			states, err := appCtx.GetStatesModule.Call(country)
 			if err != nil {
-				return err
+				return ctx.Send(
+					resolveErrMessage(err),
+				)
 			}
 
 			stateInt, _ := strconv.Atoi(txt)
+			stateInt--
 
-			session.state = states[stateInt-1]
+			if invalidInput(len(states), stateInt) {
+				delete(userSession, senderID)
+				return ctx.Send(invalidInputMsg)
+			}
+
+			session.state = states[stateInt]
 			userSession[senderID] = session
-
-			pickCityQuestion := "Pilih kota/kabupaten:\n"
 
 			cities, err := appCtx.GetCitiesModule.Call(country, session.state)
 			if err != nil {
-				return err
+				delete(userSession, senderID)
+				return ctx.Send(
+					resolveErrMessage(err),
+				)
 			}
 
-			if len(cities) <= 0 {
-				return ctx.Send("Mohon maaf data untuk provinsi tersebut belum tersedia.")
+			pickCityMsg := "Pilih kota/kabupaten:\n"
+			for i, city := range cities {
+				pickCityMsg += fmt.Sprintf("%d. %s\n", i+1, city)
 			}
 
-			for i, c := range cities {
-				pickCityQuestion += fmt.Sprintf("%d. %s\n", i+1, c)
-			}
-
-			return ctx.Send(pickCityQuestion)
-		}
-
-		if session.city == "" {
-			cities, err := appCtx.GetCitiesModule.Call(country, session.state)
-			if err != nil {
-				return err
-			}
-
-			cityInt, _ := strconv.Atoi(txt)
-
-			session.city = cities[cityInt-1]
-			userSession[senderID] = session
+			return ctx.Send(pickCityMsg)
 		}
 		defer func() {
 			delete(userSession, senderID)
 		}()
 
-		resp, err := appCtx.AirVisualClient.GetDataByCity(country, session.state, session.city)
-		if err != nil {
-			return err
+		if session.city == "" {
+			cities, err := appCtx.GetCitiesModule.Call(country, session.state)
+			if err != nil {
+				return ctx.Send(
+					resolveErrMessage(err),
+				)
+			}
+
+			cityInt, _ := strconv.Atoi(txt)
+			cityInt--
+
+			if invalidInput(len(cities), cityInt) {
+				return ctx.Send(invalidInputMsg)
+			}
+
+			session.city = cities[cityInt]
+			userSession[senderID] = session // TODO: This may unnecessary, will remove it later
 		}
 
-		return ctx.Send(resp.Report())
+		data, err := appCtx.AirVisualClient.GetDataByCity(country, session.state, session.city)
+		if err != nil {
+			return ctx.Send(
+				resolveErrMessage(err),
+			)
+		}
+
+		return ctx.Send(
+			data.Report(),
+		)
 	}
+}
+
+func invalidInput(optsLen int, input int) bool {
+	return input < 0 || input > optsLen-1
 }

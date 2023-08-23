@@ -2,6 +2,7 @@ package airvisual
 
 import (
 	"log"
+	"net/http"
 	"os"
 )
 
@@ -21,13 +22,17 @@ func (c Client) GetCities(country, state string) (data []City, err error) {
 		return nil, err
 	}
 	defer func() {
-		if err = resp.Body.Close(); err != nil {
-			log.Printf("Error unable to close response's body: %v\n", err)
+		if defErr := resp.Body.Close(); defErr != nil {
+			log.Printf("Error unable to close response's body: %v\n", defErr)
 		}
 	}()
 
-	if resp.StatusCode != 200 {
-		return []City{}, nil
+	statusCode := resp.StatusCode
+	if statusCode != http.StatusOK {
+		if statusCode == http.StatusBadRequest {
+			return nil, CityNotSupportedError
+		}
+		return nil, RateLimitError
 	}
 
 	var baseResponse BaseResponse

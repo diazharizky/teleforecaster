@@ -3,6 +3,7 @@ package airvisual
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 )
 
@@ -18,10 +19,15 @@ func (c Client) GetDataByLocation(lat, lng float32) (data *CityData, err error) 
 		return nil, err
 	}
 	defer func() {
-		if err = resp.Body.Close(); err != nil {
-			log.Printf("Error unable to close response's body: %v\n", err)
+		if defErr := resp.Body.Close(); defErr != nil {
+			log.Printf("Error unable to close response's body: %v\n", defErr)
 		}
 	}()
+
+	statusCode := resp.StatusCode
+	if statusCode != http.StatusOK {
+		return nil, RateLimitError
+	}
 
 	var baseResponse BaseResponse
 	if err = resp.Decode(&baseResponse); err != nil {

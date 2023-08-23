@@ -2,6 +2,8 @@ package airvisual
 
 import (
 	"log"
+	"net/http"
+	"os"
 )
 
 type State struct {
@@ -11,7 +13,7 @@ type State struct {
 func (c Client) GetStates(country string) (data []State, err error) {
 	params := map[string]string{
 		"country": country,
-		"key":     "",
+		"key":     os.Getenv("AIR_VISUAL_KEY"),
 	}
 
 	resp, err := c.httpClient.Get("/states", params)
@@ -19,13 +21,17 @@ func (c Client) GetStates(country string) (data []State, err error) {
 		return nil, err
 	}
 	defer func() {
-		if err = resp.Body.Close(); err != nil {
-			log.Printf("Error unable to close response's body: %v\n", err)
+		if defErr := resp.Body.Close(); defErr != nil {
+			log.Printf("Error unable to close response's body: %v\n", defErr)
 		}
 	}()
 
-	if resp.StatusCode != 200 {
-		return nil, nil
+	statusCode := resp.StatusCode
+	if statusCode != http.StatusOK {
+		if statusCode == http.StatusBadRequest {
+			return nil, StateNotSupportedError
+		}
+		return nil, RateLimitError
 	}
 
 	var baseResponse BaseResponse

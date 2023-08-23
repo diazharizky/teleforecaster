@@ -19,11 +19,11 @@ type IGetCitiesModule interface {
 }
 
 type IStateRepository interface {
-	List(country string) ([]string, error)
-	Save(country string, states []string) error
+	List(country string) []string
+	Save(country string, states []string)
 }
 
 type ICityRepository interface {
-	List(country, state string) ([]string, error)
-	Save(country, state string, cities []string) error
+	List(country, state string) []string
+	Save(country, state string, cities []string)
 }
