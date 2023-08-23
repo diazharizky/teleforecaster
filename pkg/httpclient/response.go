@@ -6,7 +6,8 @@ import (
 )
 
 type Response struct {
-	Body io.ReadCloser
+	StatusCode int
+	Body       io.ReadCloser
 }
 
 func (r Response) Decode(dest interface{}) error {

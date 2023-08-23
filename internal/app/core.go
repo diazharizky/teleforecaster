@@ -7,5 +7,10 @@ import (
 type Ctx struct {
 	AirVisualClient airvisual.Client
 
-	GetAirQualityByCityModule IGetAirQualityDataByCityModule
+	StateRepository IStateRepository
+	CityRepository  ICityRepository
+
+	GetDataByLocationModule IGetDataByLocationModule
+	GetStatesModule         IGetStatesModule
+	GetCitiesModule         IGetCitiesModule
 }

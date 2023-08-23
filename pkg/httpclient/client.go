@@ -73,6 +73,7 @@ func (c Client) sendRequest(method, path string, params map[string]string, body 
 	}
 
 	return &Response{
-		Body: resp.Body,
+		StatusCode: resp.StatusCode,
+		Body:       resp.Body,
 	}, nil
 }
