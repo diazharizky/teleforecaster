@@ -2,6 +2,7 @@ package airvisual
 
 import (
 	"log"
+	"os"
 )
 
 func (c Client) GetDataByCity(country, state, city string) (data *CityData, err error) {
@@ -9,7 +10,7 @@ func (c Client) GetDataByCity(country, state, city string) (data *CityData, err 
 		"country": country,
 		"state":   state,
 		"city":    city,
-		"key":     "c0c7b2e0-69a4-4b69-8a92-70792efae702",
+		"key":     os.Getenv("AIR_VISUAL_KEY"),
 	}
 
 	resp, err := c.httpClient.Get("/city", params)

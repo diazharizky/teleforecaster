@@ -6,6 +6,15 @@ import (
 	"gopkg.in/telebot.v3"
 )
 
+type session struct {
+	state string
+	city  string
+}
+
+const country = "Indonesia"
+
+var userSession = map[int64]session{}
+
 func Init(appCtx app.Ctx) (h []models.Handler) {
 	return []models.Handler{
 		{
@@ -15,12 +24,13 @@ func Init(appCtx app.Ctx) (h []models.Handler) {
 		},
 		{
 			Endpoint:    "/aq",
-			Description: "Get air quality data",
+			Description: "Get air quality data based on user input",
 			Fn:          aq(appCtx),
 		},
 		{
-			Endpoint: telebot.OnText,
-			Fn:       proc(appCtx),
+			Endpoint:    telebot.OnText,
+			Description: "A handler that is still part of `/aq`",
+			Fn:          aqStepper(appCtx),
 		},
 	}
 }

@@ -11,7 +11,7 @@ type State struct {
 func (c Client) GetStates(country string) (data []State, err error) {
 	params := map[string]string{
 		"country": country,
-		"key":     "c0c7b2e0-69a4-4b69-8a92-70792efae702",
+		"key":     "",
 	}
 
 	resp, err := c.httpClient.Get("/states", params)

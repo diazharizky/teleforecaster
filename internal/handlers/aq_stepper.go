@@ -8,7 +8,7 @@ import (
 	tb "gopkg.in/telebot.v3"
 )
 
-func proc(appCtx app.Ctx) func(ctx tb.Context) error {
+func aqStepper(appCtx app.Ctx) func(ctx tb.Context) error {
 	return func(ctx tb.Context) error {
 		senderID := ctx.Sender().ID
 		session, ok := userSession[senderID]
@@ -19,7 +19,7 @@ func proc(appCtx app.Ctx) func(ctx tb.Context) error {
 		txt := ctx.Text()
 
 		if session.state == "" {
-			states, err := appCtx.GetStatesModule.Call("Indonesia")
+			states, err := appCtx.GetStatesModule.Call(country)
 			if err != nil {
 				return err
 			}
@@ -31,7 +31,7 @@ func proc(appCtx app.Ctx) func(ctx tb.Context) error {
 
 			pickCityQuestion := "Pilih kota/kabupaten:\n"
 
-			cities, err := appCtx.GetCitiesModule.Call("Indonesia", session.state)
+			cities, err := appCtx.GetCitiesModule.Call(country, session.state)
 			if err != nil {
 				return err
 			}
@@ -44,7 +44,7 @@ func proc(appCtx app.Ctx) func(ctx tb.Context) error {
 		}
 
 		if session.city == "" {
-			cities, err := appCtx.GetCitiesModule.Call("Indonesia", session.state)
+			cities, err := appCtx.GetCitiesModule.Call(country, session.state)
 			if err != nil {
 				return err
 			}
@@ -58,7 +58,7 @@ func proc(appCtx app.Ctx) func(ctx tb.Context) error {
 			delete(userSession, senderID)
 		}()
 
-		resp, err := appCtx.AirVisualClient.GetDataByCity("Indonesia", session.state, session.city)
+		resp, err := appCtx.AirVisualClient.GetDataByCity(country, session.state, session.city)
 		if err != nil {
 			return err
 		}

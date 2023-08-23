@@ -7,13 +7,6 @@ import (
 	tb "gopkg.in/telebot.v3"
 )
 
-type session struct {
-	state string
-	city  string
-}
-
-var userSession = map[int64]session{}
-
 func aq(appCtx app.Ctx) func(ctx tb.Context) error {
 	return func(ctx tb.Context) error {
 		senderID := ctx.Sender().ID
@@ -22,7 +15,7 @@ func aq(appCtx app.Ctx) func(ctx tb.Context) error {
 			userSession[senderID] = session{}
 		}
 
-		states, err := appCtx.GetStatesModule.Call("Indonesia")
+		states, err := appCtx.GetStatesModule.Call(country)
 		if err != nil {
 			return err
 		}

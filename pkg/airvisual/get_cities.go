@@ -2,6 +2,7 @@ package airvisual
 
 import (
 	"log"
+	"os"
 )
 
 type City struct {
@@ -12,7 +13,7 @@ func (c Client) GetCities(country, state string) (data []City, err error) {
 	params := map[string]string{
 		"country": country,
 		"state":   state,
-		"key":     "c0c7b2e0-69a4-4b69-8a92-70792efae702",
+		"key":     os.Getenv("AIR_VISUAL_KEY"),
 	}
 
 	resp, err := c.httpClient.Get("/cities", params)
